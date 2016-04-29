@@ -87,7 +87,6 @@ class like_widget extends WP_Widget {
 					</div>
 					<script>
 						$(document).ready(function(){
-							
 							var likeObj = {"user_id":"<?php echo $user_id ;?>","post_id":"<?php echo $post_id; ?>"};
 							likeObj["likeStatus"]="unknown";
 							

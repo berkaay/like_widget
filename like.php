@@ -1,52 +1,68 @@
-<?php
-		require_once( str_replace('//','/',dirname(__FILE__).'/') .'../../../wp-config.php');
-		
-		global $wpdb;
-		$GLOBALS['wpdb'] = $wpdb;
-
-		
-		
-		
-		$table_name = $wpdb->prefix."like_widget";	
-
-		
-		extract($_POST);//$data			
-		if($_POST){
-			extract($_POST['data']);
-   			$date =  new DateTime();
-           
-			if($likeStatus=="unknown"){
-				$sql  = "select * from ". $table_name. " where user_id ='".$user_id."'AND post_id =' ". $post_id. "'";
-				$wpdb->query($sql);
-				$results  = $wpdb->get_results( $sql );
-
-				$rowCount = $wpdb->num_rows;
-
-				echo $rowCount;
-			}
-			else if($likeStatus =="GET_LIKES_TEN"){
+<html>
+	<head>
+		<title>PagesLiked</title>
+			
+			<style>
+				table {
+				    border-collapse: collapse;
+				    width: 100%;
+				}
 				
-				$secondTableName = $wpdb->prefix."posts";
-
-				$sql = "select post_title , date_liked from ".$table_name.",".$secondTableName ." where user_id='".$user_id."' and ". $table_name.".post_id = ".$secondTableName.".ID  order by 'date_liked' LIMIT 10 " ;
+				th, td {
+				    text-align: left;
+				    padding: 8px;
+				}
 				
-				$wpdb->query($sql);
-				$results  = $wpdb->get_results( $sql );
-				$rowCount = $wpdb->num_rows;
-				echo json_encode($results);
-			}
-			else if($likeStatus == "GET_ALL_LIKES"){
-				$sql = "select * from ".$table_name. "where user_id='".$user_id."' order by date_liked";
-
-			}
-			else if($likeStatus == "liked"){
+				tr:nth-child(even){background-color: #f2f2f2}
 				
-				$wpdb->insert( $table_name, array( 'user_id' => $user_id, 'post_id' => $post_id,'date_liked' => $date->getTimestamp() ) );
-			}
-			else if($likeStatus == "disliked"){
-				$wpdb->query(
-              'delete from '. $table_name .' where user_id = "'. $user_id.'"AND post_id="'.$post_id.'"');
-			}
-		}
-	
-?>
+				th {
+				    background-color: #4CAF50;
+				    color: white;
+				}
+			</style>
+		</head>
+	<body>
+
+				 <h1>Pages You Have Liked So Far</h1>
+				 	<table id = "table">
+		
+								<th colspan=3 style="text-align:center">Posts Liked </th>
+								
+		
+							</table>
+						
+					        
+				<script type = "text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+				<script type="text/javascript">
+					alert("hi");
+						$("#table").ready(function(){
+											var likeObj = {"user_id":"<?php echo $user_id ;?>","post_id":"<?php echo $post_id; ?>"};
+											likeObj['likeStatus']='GET_LIKES_TEN';
+											
+											$.ajax({
+													
+								 					type : 'POST',
+								 					url : '/wp-content/plugins/like_widget/like.php',
+								 					data:{data:likeObj},
+								 					success:function(data){
+								 						var obj = JSON.parse(data);
+								 							for(var key in obj){
+								 							
+								 								let post_title = obj[key]['post_title'];
+								 								let date_liked = obj[key]['date_liked'];
+								 								var date = new Date(date_liked * 1000);
+										 						$("#table").append("<tr><td> "+ post_title + "</td> <td>" 
+										 						+ date + "</td><td><a id='delete'> delete </a> </td> </tr> ");
+								 							}					 						
+								 						
+								 						
+								 					}	
+								 					 
+								 				});
+										});
+					</script>
+			
+			
+		
+	</body>	
+</html>
