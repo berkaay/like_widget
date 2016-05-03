@@ -95,6 +95,7 @@ class like_widget extends WP_Widget {
 					 					url : '/wp-content/plugins/like_widget/like.php',
 					 					data:{data:likeObj},
 					 					success:function(data){
+					 							
 					 						if(data == 0){
 					 							$("#like").css("background-color","black");
 						 						$("#like").html("LIKE");
@@ -105,30 +106,32 @@ class like_widget extends WP_Widget {
 					 						}	
 					 					} 
 					 				});
-							$(document).ready(function(){
+							
 								likeObj['likeStatus']='GET_LIKES_TEN';
 								$.ajax({
 					 					type : 'POST',
 					 					url : '/wp-content/plugins/like_widget/like.php',
 					 					data:{data:likeObj},
 					 					success:function(data){
+					 						//alert(data);
 					 						var obj = JSON.parse(data);
 					 							for(var key in obj){
-					 							
+					 								let post_id = obj[key]['post_id'];
 					 								let post_title = obj[key]['post_title'];
 					 								let date_liked = obj[key]['date_liked'];
 					 								var date = new Date(date_liked * 1000);
+							 					
 							 						$("#table").append("<tr><td> "+ post_title + "</td> <td>" 
-							 						+ date + "</td><td><a href = '#' class='delete'  > delete </a> </td> </tr> ");
+							 						+ date + "</td><td><a href = '#' class='delete' id =" + post_id + "> delete </a> </td> </tr> ");
 					 							}					 						
-					 							$("#table").append("<tr><td colspan = '3' ><div class='seeMore'><a href= '#' class='seeMore' > <p class = 'seeMore' align = 'center'> See More I liked</p> </a></div></td><tr>");
+					 							$("#table").append("<tr><td colspan = '3' ><div id='seeMore' ><a href= '#' id='seeMore' > <p id = 'seeMore' align = 'center'> See More I liked</p> </a></div></td><tr>");
 												
 												
 					 							
-					 					}	
+					 					}		
 					 					 
 					 				});
-							});
+							
 					 		$("#like").click(function(){
 					 		if(likeObj['user_id']!=0){	
 					 			if($("#like").html()=="LIKE"){	
@@ -142,13 +145,13 @@ class like_widget extends WP_Widget {
 					 											 					
 					 					 $("#like").css("background-color","blue");
 						 				 $("#like").html("LIKED");
+
 					 					} 
 					 	     			});
 					 			}
 						 		else{
 						 			likeObj["likeStatus"]="disliked";
 							 			$.ajax({
-							 				
 							 			type : 'POST',
 					 					url : '/wp-content/plugins/like_widget/like.php',
 					 					data:{data:likeObj},
@@ -170,19 +173,32 @@ class like_widget extends WP_Widget {
 					<table id = "table">
 
 						<th colspan=3 style="text-align:center">Posts Liked </th>
-							<form style="display: none" action="pageLikes.php" method="post" id="form">
+							<form style="display: none" action="wp-content/plugins/like_widget/pageLikes.php" method="post" id="form">
 								 <input type="hidden" name="user_id"/> 
 								 <input type="hidden" name="post_id"/>
 							</form>
+							<form style="display: none" action="wp-content/plugins/like_widget/like.php" method="post" id="form-delete">
+								 <input type="hidden" name="user_id"/> 
+								 <input type="hidden" name="post_id"/>
+								 <input type="hidden" name="likeStatus"/>
+							</form>
 							
 								<script>
-										
-									$('.seeMore').click(function() {
-										alert("you clicked me");
+								$(document).ready(function(){
+									$(document).on('click', '#seeMore', function() {
 				 					  $("input[name=user_id]").val('<?php echo $user_id ?>');
 				 					  $("input[name=post_id]").val('<?php echo $post_id ?>');
-				 					  $("#form").submit();
+				 					  $("#form").submit(); });
+									
+									
+									$(document).on('click','.delete', function() {
+				 					  $("input[name=user_id]").val('<?php echo $user_id ?>');
+				 					  $("input[name=likeStatus]").val('disliked');
+									 $("input[name=post_id]").val($(this).data('post_id'));
+				 					  $("#form-delete").submit(); });
+
 									});
+								
 								</script>		
 
 					</table>	
@@ -195,5 +211,5 @@ add_action( 'widgets_init', function(){
 	register_widget( 'like_widget' );
 });	
 	
-//add_action('widgets_init', create_function('', 'return register_widget("like_widget");'));﻿
+//add_action('widgets_init', create_function('', 'return register_widget("like_widget");'));
 ?>

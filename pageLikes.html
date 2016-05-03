@@ -24,17 +24,25 @@
 	<body>
 
 				 <h1>Pages You Have Liked So Far</h1>
+				 <?php extract($_POST);?>
 				 	<table id = "table">
 		
 								<th colspan=3 style="text-align:center">Posts Liked </th>
 								
 		
 							</table>
+							
+							
+					<form style="display: none" action="wp-content/plugins/like_widget/like.php" method="post" id="form-delete">
+								 <input type="hidden" name="user_id"/> 
+								 <input type="hidden" name="post_id"/>
+								 <input type="hidden" name="likeStatus"/>
+					</form>
 						
 					        
 				<script type = "text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-				<script type="text/javascript">
-					alert("hi");
+				<script >
+				
 						$("#table").ready(function(){
 											var likeObj = {"user_id":"<?php echo $user_id ;?>","post_id":"<?php echo $post_id; ?>"};
 											likeObj['likeStatus']='GET_LIKES_TEN';
@@ -47,14 +55,17 @@
 								 					success:function(data){
 								 						var obj = JSON.parse(data);
 								 							for(var key in obj){
-								 							
+								 								let post_id = obj[key]['post_id'];
 								 								let post_title = obj[key]['post_title'];
 								 								let date_liked = obj[key]['date_liked'];
 								 								var date = new Date(date_liked * 1000);
 										 						$("#table").append("<tr><td> "+ post_title + "</td> <td>" 
-										 						+ date + "</td><td><a id='delete'> delete </a> </td> </tr> ");
+										 						+ date + "</td><td><a href = '#' class='delete' id =" + post_id + "> delete </a> </td> </tr> ");
 								 							}					 						
-								 						
+								 							$("#table").append("<tr><td colspan = '3' ><div id='seeMore' ><a href= '#' id='seeMore' > <p id = 'seeMore' align = 'center'> See More I liked</p> </a></div></td><tr>");
+															
+												
+					 							
 								 						
 								 					}	
 								 					 
