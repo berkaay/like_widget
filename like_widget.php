@@ -167,6 +167,24 @@ class like_widget extends WP_Widget {
 	 
 						}
 					 	});
+					 	
+					 	$(document).on('click', '.delete', function() {
+					 		 	likeObj['likeStatus']="disliked";
+					 		 	likeObj['post_id'] = $(this).attr('id');
+					 		 	$.ajax({			
+					 				type : 'POST',
+					 				url : '/wp-content/plugins/like_widget/like.php',
+					 				data:{data:likeObj},
+				 			success:function(data){
+				 					location.reload();
+	 				
+	 					}					 						
+		 		
+		 		});
+		 		 	
+		 		 	
+		 		 });
+		 		
 					
 					});	
 					</script>

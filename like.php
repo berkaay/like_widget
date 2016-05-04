@@ -13,7 +13,11 @@
 		$secondTableName = $wpdb->prefix."posts";
 		
 		extract($_POST);//$data	
-		extract($data);//$user_id,$post_id,$likeStatus
+		print_r($_POST);
+		if(isset($data)){
+		
+			extract($data);//$user_id,$post_id,$likeStatus
+		}
 	
 		
 		if($_POST){
@@ -41,7 +45,7 @@
 
 //				$sql = "select ".$table_name.".post_id,".$secondTableName .".post_title ,".$table_name.".date_liked from ".$table_name." f,".$secondTableName ." s where f.user_id='".$user_id."' and ". $table_name.".post_id = ".$secondTableName.".ID  order by 'date_liked' LIMIT 10 " ;
 
-				$sql = "SELECT s.post_title,f.date_liked
+				$sql = "SELECT s.post_title,f.date_liked,f.post_id
 						FROM ".$table_name." f,". $secondTableName." s 
 						WHERE user_id = '".$user_id."'
 						AND f.post_id = s.ID
@@ -58,26 +62,35 @@
 				
 				
 			}
-			else if($likeStatus == "GET_ALL_LIKES"){
+			else if($likeStatus == "GET_LIKES_ALL"){
 				
-					$secondTableName = $wpdb->prefix."posts";
+				$secondTableName = $wpdb->prefix."posts";
 
-				$sql = "select * from ".$table_name. " where user_id= '".$user_id."' order by date_liked ";
-				
+				$sql = "SELECT s.post_title,f.date_liked,f.post_id
+						FROM ".$table_name." f,". $secondTableName." s 
+						WHERE user_id = '".$user_id."'
+						AND f.post_id = s.ID
+						ORDER BY  'date_liked'
+						";
 				$wpdb->query($sql);
+				
 				$results  = $wpdb->get_results( $sql );
-			//	ob_end_clean();
+			
+				ob_end_clean();
+			
 				echo json_encode($results);
-					
+				
 			}
 			else if($likeStatus == "liked"){
 				
 				$wpdb->insert( $table_name, array( 'user_id' => $user_id, 'post_id' => $post_id,'date_liked' => $date->getTimestamp() ) );
 			}
 			else if($likeStatus == "disliked"){
-				$wpdb->query(
-              'delete from '. $table_name .' where user_id = "'. $user_id.'"AND post_id="'.$post_id.'"');
+				 $wpdb->query(
+	 			'delete from '. $table_name .' where user_id = "'. $user_id.'"AND post_id="'.$post_id.'"');
+              	
               $wpdb->print_error();
+              
 			}
 		}
 
